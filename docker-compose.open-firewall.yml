@@ -1,0 +1,35 @@
+# One-shot: open Kingpin UDP ports on the Coolify host (ufw / firewalld / iptables).
+# Deploy once via Coolify, then stop/delete this app.
+services:
+  open-firewall:
+    image: alpine:3.20
+    container_name: kingpin-open-firewall
+    privileged: true
+    pid: host
+    network_mode: host
+    volumes:
+      - /:/host
+    restart: "no"
+    command:
+      - sh
+      - -c
+      - |
+        set -eu
+        echo "Opening UDP 31510-31512 on host..."
+        if chroot /host command -v ufw >/dev/null 2>&1; then
+          chroot /host ufw allow 31510:31512/udp comment 'Kingpin DM/CTF/Bagman' || true
+          chroot /host ufw status numbered || true
+          chroot /host ufw --force reload || true
+          echo "Applied via ufw"
+        elif chroot /host command -v firewall-cmd >/dev/null 2>&1; then
+          chroot /host firewall-cmd --permanent --add-port=31510-31512/udp
+          chroot /host firewall-cmd --reload
+          chroot /host firewall-cmd --list-ports || true
+          echo "Applied via firewalld"
+        else
+          chroot /host iptables -C INPUT -p udp --dport 31510:31512 -j ACCEPT 2>/dev/null \
+            || chroot /host iptables -I INPUT -p udp --dport 31510:31512 -j ACCEPT
+          echo "Applied via iptables"
+        fi
+        echo "DONE"
+        sleep 30
