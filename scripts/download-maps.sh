@@ -52,17 +52,46 @@ find "$ROOT" -type f -iname '*.bsp' ! -path "$ROOT/main/maps/*" ! -path "$ROOT/c
 		mv -f "$f" "$ROOT/main/maps/$(basename "$f")"
 	done || true
 
-# DM rotation: non-team / non-ctf maps
-find "$ROOT/main/maps" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' 2>/dev/null |
-	sed 's/\.[Bb][Ss][Pp]$//' |
-	grep -viE '^(team_|ctf)' |
-	sort -u > "$ROOT/mmod_dm/maps.txt" || true
+# Build mode rotations from every BSP in main/maps (and CTF pack dir if present).
+# CTF: name contains "ctf"
+# Bagman: team*/bm_* / *bagman* (and not already CTF)
+# DM: everything else
+ALL_MAPS="$(mktemp)"
+BM_MAPS="$(mktemp)"
+DM_MAPS="$(mktemp)"
+CTF_MAPS="$(mktemp)"
+trap 'rm -f "$ALL_MAPS" "$BM_MAPS" "$DM_MAPS" "$CTF_MAPS"' EXIT
 
-# Bagman rotation
 find "$ROOT/main/maps" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' 2>/dev/null |
 	sed 's/\.[Bb][Ss][Pp]$//' |
-	grep -iE '^(team_|.*bag)' |
-	sort -u > "$ROOT/mmod_bm/maps_bm.txt" || true
-cp -f "$ROOT/mmod_bm/maps_bm.txt" "$ROOT/mmod_bm/maps.txt"
+	sort -u > "$ALL_MAPS"
+
+grep -iE 'ctf' "$ALL_MAPS" > "$CTF_MAPS" || true
+grep -viE 'ctf' "$ALL_MAPS" |
+	grep -iE '^(team|bm_)|bagman|_team$|team_|team-' > "$BM_MAPS" || true
+grep -viE 'ctf' "$ALL_MAPS" |
+	grep -viE '^(team|bm_)|bagman|_team$|team_|team-' > "$DM_MAPS" || true
+
+mkdir -p "$ROOT/mmod_dm" "$ROOT/mmod_bm"
+cp -f "$DM_MAPS" "$ROOT/mmod_dm/maps.txt"
+cp -f "$BM_MAPS" "$ROOT/mmod_bm/maps_bm.txt"
+cp -f "$BM_MAPS" "$ROOT/mmod_bm/maps.txt"
+
+# CTF: merge pack maps + any CTF BSPs that landed in main/maps
+if [ -d "$ROOT/ctf" ]; then
+	mkdir -p "$ROOT/ctf/maps"
+	find "$ROOT/main/maps" -maxdepth 1 -type f -iname '*ctf*.bsp' -print0 2>/dev/null |
+		while IFS= read -r -d '' f; do
+			cp -n "$f" "$ROOT/ctf/maps/$(basename "$f")" 2>/dev/null || true
+		done || true
+	find "$ROOT/ctf/maps" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' 2>/dev/null |
+		sed 's/\.[Bb][Ss][Pp]$//' |
+		sort -u > "$ROOT/ctf/maps.txt" || true
+fi
 
 echo "Maps ready. BSP in main/maps: $(find "$ROOT/main/maps" -maxdepth 1 -iname '*.bsp' 2>/dev/null | wc -l)"
+echo "  DM maps.txt:     $(wc -l < "$ROOT/mmod_dm/maps.txt")"
+echo "  Bagman maps_bm:  $(wc -l < "$ROOT/mmod_bm/maps_bm.txt")"
+if [ -f "$ROOT/ctf/maps.txt" ]; then
+	echo "  CTF maps.txt:    $(wc -l < "$ROOT/ctf/maps.txt")"
+fi
