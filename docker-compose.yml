@@ -1,4 +1,4 @@
-# Coolify / Linux: builds image from this repo and publishes UDP game ports.
+# Coolify / Linux: builds image once (dm), CTF/Bagman reuse the same tag.
 services:
   dm:
     build: .
@@ -26,12 +26,14 @@ services:
       ]
 
   ctf:
-    build: .
     image: kingpin-servers:latest
+    pull_policy: never
     container_name: kingpin-ctf
     restart: unless-stopped
     tty: true
     stdin_open: true
+    depends_on:
+      - dm
     ports:
       - "31511:31511/udp"
     command:
@@ -51,12 +53,14 @@ services:
       ]
 
   bagman:
-    build: .
     image: kingpin-servers:latest
+    pull_policy: never
     container_name: kingpin-bagman
     restart: unless-stopped
     tty: true
     stdin_open: true
+    depends_on:
+      - dm
     ports:
       - "31512:31512/udp"
     command:
