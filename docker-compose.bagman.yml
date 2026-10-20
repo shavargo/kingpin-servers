@@ -7,8 +7,6 @@ services:
     image: kingpin-servers:bagman-bots
     container_name: kingpin-bagman
     restart: unless-stopped
-    tty: true
-    stdin_open: true
     environment:
       KP_MODE: bm
       KP_PORT: "31512"

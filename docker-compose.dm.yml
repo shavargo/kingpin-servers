@@ -7,8 +7,6 @@ services:
     image: kingpin-servers:dm-bots
     container_name: kingpin-dm
     restart: unless-stopped
-    tty: true
-    stdin_open: true
     environment:
       KP_MODE: dm
       KP_PORT: "31510"
