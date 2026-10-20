@@ -38,11 +38,19 @@ fetch "kingpin/main/maps/map-packs/" "openrift_mappack.zip"
 fetch "kingpin/server/official/" "original_dm_maps.zip"
 fetch "kingpin/server/official/" "original_bm_maps.zip"
 
-# Move any loose BSPs sitting in wrong places into main/maps
+# Official stock zips unpack to $ROOT/maps/ — game expects main/maps/
+if [ -d "$ROOT/maps" ]; then
+	for f in "$ROOT/maps"/*.bsp; do
+		[ -f "$f" ] || continue
+		cp -n "$f" "$ROOT/main/maps/$(basename "$f")" 2>/dev/null || cp -f "$f" "$ROOT/main/maps/$(basename "$f")"
+	done
+fi
+
+# Move any other loose BSPs sitting in wrong places into main/maps
 find "$ROOT" -type f -iname '*.bsp' ! -path "$ROOT/main/maps/*" ! -path "$ROOT/ctf/*" -print0 |
 	while IFS= read -r -d '' f; do
 		mv -f "$f" "$ROOT/main/maps/$(basename "$f")"
-	done
+	done || true
 
 # DM rotation: non-team / non-ctf maps
 find "$ROOT/main/maps" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' 2>/dev/null |
