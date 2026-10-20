@@ -1,0 +1,26 @@
+# Coolify app: kingpin-ctf — UDP 31511
+services:
+  ctf:
+    build: .
+    image: kingpin-servers:ctf
+    container_name: kingpin-ctf
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "31511:31511/udp"
+    command:
+      [
+        "./kpded2",
+        "+set",
+        "dedicated",
+        "1",
+        "+set",
+        "game",
+        "ctf",
+        "+set",
+        "port",
+        "31511",
+        "+exec",
+        "server.cfg",
+      ]

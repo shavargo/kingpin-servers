@@ -1,0 +1,26 @@
+# Coolify app: kingpin-dm — UDP 31510
+services:
+  dm:
+    build: .
+    image: kingpin-servers:dm
+    container_name: kingpin-dm
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "31510:31510/udp"
+    command:
+      [
+        "./kpded2",
+        "+set",
+        "dedicated",
+        "1",
+        "+set",
+        "game",
+        "mmod_dm",
+        "+set",
+        "port",
+        "31510",
+        "+exec",
+        "server.cfg",
+      ]

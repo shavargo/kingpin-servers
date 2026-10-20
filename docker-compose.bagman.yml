@@ -1,0 +1,26 @@
+# Coolify app: kingpin-bagman — UDP 31512
+services:
+  bagman:
+    build: .
+    image: kingpin-servers:bagman
+    container_name: kingpin-bagman
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "31512:31512/udp"
+    command:
+      [
+        "./kpded2",
+        "+set",
+        "dedicated",
+        "1",
+        "+set",
+        "game",
+        "mmod_bm",
+        "+set",
+        "port",
+        "31512",
+        "+exec",
+        "server.cfg",
+      ]
