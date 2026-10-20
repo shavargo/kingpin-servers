@@ -1,13 +1,14 @@
 FROM i386/debian:bookworm-slim
 
 RUN apt-get update \
-	&& apt-get install -y --no-install-recommends ca-certificates curl unzip \
+	&& apt-get install -y --no-install-recommends ca-certificates curl unzip findutils \
 	&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /kingpin
 
 ARG KP_BASE=https://www.kingpin.info/download/kingpin
 
+# Core server binaries + mods + CTF (from kingpin.info)
 RUN set -eux; \
 	mkdir -p /tmp/dl /kingpin/main/maps; \
 	curl -fsSL "$KP_BASE/server/unofficial/kpded2/linux/kpded2-linux.zip" -o /tmp/dl/kpded2.zip; \
@@ -24,20 +25,28 @@ RUN set -eux; \
 	curl -fsSL "$KP_BASE/server/mods/colors_ctf/client_files/ctf_v11_client.zip" -o /tmp/dl/ctf_cli.zip; \
 	unzip -qo /tmp/dl/ctf_cli.zip -d /tmp/dl/ctf_cli; \
 	cp -a /tmp/dl/ctf_cli/ctf/. /kingpin/ctf/; \
-	curl -fsSL "$KP_BASE/server/official/original_dm_maps.zip" -o /tmp/dl/dm_maps.zip; \
-	curl -fsSL "$KP_BASE/server/official/original_bm_maps.zip" -o /tmp/dl/bm_maps.zip; \
-	unzip -qo /tmp/dl/dm_maps.zip -d /kingpin/main/maps; \
-	unzip -qo /tmp/dl/bm_maps.zip -d /kingpin/main/maps; \
-	printf "\n" > /kingpin/mmod_dm/default.cfg; \
-	printf "\n" > /kingpin/mmod_bm/default.cfg; \
-	printf "\n" > /kingpin/ctf/default.cfg; \
+	printf '\n' > /kingpin/mmod_dm/default.cfg; \
+	printf '\n' > /kingpin/mmod_bm/default.cfg; \
+	printf '\n' > /kingpin/ctf/default.cfg; \
 	rm -rf /tmp/dl
 
+# Community map packs (same yo-ass + bagman set as kingpin-launcher)
+COPY scripts/download-maps.sh /tmp/download-maps.sh
+RUN chmod +x /tmp/download-maps.sh \
+	&& KP_BASE=https://www.kingpin.info/download/kingpin /tmp/download-maps.sh /kingpin/main/maps /tmp/mapdl \
+	&& rm -f /tmp/download-maps.sh
+
+# Server configs (hostnames, limits, admin)
 COPY configs/mmod_dm/server.cfg configs/mmod_dm/comp.ini /kingpin/mmod_dm/
-COPY configs/mmod_bm/server.cfg configs/mmod_bm/comp.ini configs/mmod_bm/maps.txt configs/mmod_bm/maps_bm.txt /kingpin/mmod_bm/
+COPY configs/mmod_bm/server.cfg configs/mmod_bm/comp.ini /kingpin/mmod_bm/
 COPY configs/ctf/server.cfg configs/ctf/comp.ini /kingpin/ctf/
 
-RUN chown -R nobody:nogroup /kingpin
+# Keep generated map rotation files if present; fall back to config copies
+COPY configs/mmod_bm/maps_bm.txt /kingpin/mmod_bm/maps_bm.txt.bak
+RUN if [ ! -s /kingpin/mmod_bm/maps_bm.txt ]; then cp /kingpin/mmod_bm/maps_bm.txt.bak /kingpin/mmod_bm/maps_bm.txt; fi \
+	&& cp -f /kingpin/mmod_bm/maps_bm.txt /kingpin/mmod_bm/maps.txt \
+	&& rm -f /kingpin/mmod_bm/maps_bm.txt.bak \
+	&& chown -R nobody:nogroup /kingpin
 
 USER nobody
 CMD ["./kpded2", "+set", "dedicated", "1", "+set", "game", "mmod_dm", "+set", "port", "31510", "+exec", "server.cfg"]
