@@ -1,69 +1,60 @@
 #!/bin/sh
-# Download community map packs from kingpin.info (same set as kingpin-launcher).
+# Same community packs as kingpin-launcher (maps only ? no player models).
 set -eu
-KP_BASE="${KP_BASE:-https://www.kingpin.info/download/kingpin}"
-MAPS_DIR="${1:-/kingpin/main/maps}"
+KP_DL="${KP_DL:-https://www.kingpin.info/download/index.php}"
+ROOT="${1:-/kingpin}"
 TMP="${2:-/tmp/mapdl}"
 
-mkdir -p "$MAPS_DIR" "$TMP"
+mkdir -p "$ROOT/main/maps" "$TMP"
 
-download_unzip() {
-	url="$1"
-	name="$2"
-	echo "Downloading $name..."
-	curl -fsSL "$url" -o "$TMP/$name"
-	unzip -qo "$TMP/$name" -d "$TMP/extract"
-	# Flatten common zip layouts into main/maps
-	find "$TMP/extract" -type f \( -iname '*.bsp' -o -iname '*.pcx' -o -iname '*.tga' -o -iname '*.wal' -o -iname '*.wav' \) -print0 |
-		while IFS= read -r -d '' f; do
-			rel="${f#"$TMP/extract/"}"
-			# Prefer files already under a maps/ path
-			case "$rel" in
-			*/maps/*) dest="$MAPS_DIR/$(basename "$f")" ;;
-			*.bsp|*.BSP) dest="$MAPS_DIR/$(basename "$f")" ;;
-			*)
-				# Keep supporting assets under main/ when possible
-				case "$rel" in
-				*/textures/*|*/env/*|*/sound/*|*/pics/*)
-					# skip extras for slim server image ? maps only
-					continue
-					;;
-				*) dest="$MAPS_DIR/$(basename "$f")" ;;
-				esac
-				;;
-			esac
-			cp -f "$f" "$dest"
-		done
-	rm -rf "$TMP/extract" "$TMP/$name"
+fetch() {
+	dir="$1"
+	file="$2"
+	out="$TMP/$file"
+	echo "Downloading $file ..."
+	curl -fsSL "${KP_DL}?dir=${dir}&file=${file}" -o "$out"
+	# Sanity: reject HTML error pages
+	if head -c 15 "$out" | grep -qi '<!DOCTYPE\|<html'; then
+		echo "ERROR: got HTML instead of zip for $file" >&2
+		exit 1
+	fi
+	unzip -qo "$out" -d "$ROOT"
+	rm -f "$out"
 }
 
-YOASS="$KP_BASE/main/maps/map-packs/map-pack-n-yo-ass"
-OLD="$YOASS/all_maps_1999-2007"
-NEW="$YOASS/death_match_maps_2007-2017"
+YOASS_OLD="kingpin/main/maps/map-packs/map-pack-n-yo-ass/all_maps_1999-2007/"
+YOASS_NEW="kingpin/main/maps/map-packs/map-pack-n-yo-ass/death_match_maps_2007-2017/"
 
 i=1
 while [ "$i" -le 11 ]; do
-	download_unzip "$OLD/bcs_map_pack_n_yo_ass-$i.zip" "yoass-$i.zip"
+	fetch "$YOASS_OLD" "bcs_map_pack_n_yo_ass-$i.zip"
 	i=$((i + 1))
 done
-download_unzip "$NEW/bcs_map_pack_n_yo_ass-12.zip" "yoass-12.zip"
-download_unzip "$NEW/bcs_map_pack_n_yo_ass-13.zip" "yoass-13.zip"
+fetch "$YOASS_NEW" "bcs_map_pack_n_yo_ass-12.zip"
+fetch "$YOASS_NEW" "bcs_map_pack_n_yo_ass-13.zip"
 
-download_unzip "$KP_BASE/main/maps/map-packs/bagman_mappack.zip" "bagman_mappack.zip"
-download_unzip "$KP_BASE/main/maps/map-packs/openrift_mappack.zip" "openrift_mappack.zip"
-download_unzip "$KP_BASE/server/official/original_dm_maps.zip" "original_dm_maps.zip"
-download_unzip "$KP_BASE/server/official/original_bm_maps.zip" "original_bm_maps.zip"
+fetch "kingpin/main/maps/map-packs/" "bagman_mappack.zip"
+fetch "kingpin/main/maps/map-packs/" "openrift_mappack.zip"
+fetch "kingpin/server/official/" "original_dm_maps.zip"
+fetch "kingpin/server/official/" "original_bm_maps.zip"
 
-# Rotation lists for Monkey Mod
-find "$MAPS_DIR" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' |
+# Move any loose BSPs sitting in wrong places into main/maps
+find "$ROOT" -type f -iname '*.bsp' ! -path "$ROOT/main/maps/*" ! -path "$ROOT/ctf/*" -print0 |
+	while IFS= read -r -d '' f; do
+		mv -f "$f" "$ROOT/main/maps/$(basename "$f")"
+	done
+
+# DM rotation: non-team / non-ctf maps
+find "$ROOT/main/maps" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' 2>/dev/null |
 	sed 's/\.[Bb][Ss][Pp]$//' |
-	grep -viE '^(team_|ctf|bagman)' |
-	sort -u > /kingpin/mmod_dm/maps.txt || true
+	grep -viE '^(team_|ctf)' |
+	sort -u > "$ROOT/mmod_dm/maps.txt" || true
 
-find "$MAPS_DIR" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' |
+# Bagman rotation
+find "$ROOT/main/maps" -maxdepth 1 -type f -iname '*.bsp' -printf '%f\n' 2>/dev/null |
 	sed 's/\.[Bb][Ss][Pp]$//' |
-	grep -iE '^(team_|.*bagman|.*bm_)' |
-	sort -u > /kingpin/mmod_bm/maps_bm.txt || true
-cp -f /kingpin/mmod_bm/maps_bm.txt /kingpin/mmod_bm/maps.txt
+	grep -iE '^(team_|.*bag)' |
+	sort -u > "$ROOT/mmod_bm/maps_bm.txt" || true
+cp -f "$ROOT/mmod_bm/maps_bm.txt" "$ROOT/mmod_bm/maps.txt"
 
-echo "Map download done. BSP count: $(find "$MAPS_DIR" -maxdepth 1 -iname '*.bsp' | wc -l)"
+echo "Maps ready. BSP in main/maps: $(find "$ROOT/main/maps" -maxdepth 1 -iname '*.bsp' 2>/dev/null | wc -l)"

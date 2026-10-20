@@ -1,47 +1,35 @@
-# Kingpin servers — DM / CTF / Bagman
+# Kingpin servers (DM / CTF / Bagman)
 
-| Server | Mode       | UDP port | Connect              |
-|--------|------------|----------|----------------------|
-| DM     | Deathmatch | 31510    | `connect IP:31510`   |
-| CTF    | Colors CTF | 31511    | `connect IP:31511`   |
-| Bagman | Monkey Mod | 31512    | `connect IP:31512`   |
+Docker image builds from [kingpin.info](https://www.kingpin.info/download/) — KPDED2, Monkey Mod, Colors CTF, and the same community map packs as **kingpin-launcher**.
 
-## Recommended on this PC: native Windows
+| Service | Mode | UDP port |
+|---------|------|----------|
+| dm | Deathmatch | 31510 |
+| ctf | Colors CTF | 31511 |
+| bagman | Bagman | 31512 |
 
-Docker Desktop + 32-bit Linux is unreliable for Kingpin UDP. Use the Windows KPDED2 setup:
+Repo: https://github.com/shavargo/kingpin-servers (private)
 
-```
-%USERPROFILE%\kingpin-servers\windows\
-```
+## Map packs (downloaded at image build)
 
-**Start all three:** double-click `start-all.bat`  
-**Stop all:** `stop-all.bat`  
-Or use `start-dm.bat` / `start-ctf.bat` / `start-bagman.bat` individually.
+- Official stock DM + BM maps
+- **map-pack-n-yo-ass** parts 1–13
+- **bagman_mappack.zip**
+- **openrift_mappack.zip**
+- Colors CTF v1.1 client maps
 
-Configs:
+## Coolify
 
-- `windows\mmod_dm\server.cfg` — DM hostname / fraglimit / maps  
-- `windows\mmod_bm\server.cfg` — Bagman cashlimit / maps  
-- `windows\ctf\server.cfg` — CTF settings  
-- `windows\*\comp.ini` — admin password, map voting, MOTD  
+1. Project **Kingpin** → **+ Add Resource**
+2. **Private Repository (with Deploy Key)** → `https://github.com/shavargo/kingpin-servers`
+3. Build pack: **Docker Compose**, file `docker-compose.yml`
+4. Deploy (first build ~2 GB map download — slow)
+5. Open host firewall **UDP 31510–31512**
 
-`windows\main` is a junction to your Steam `Kingpin\main` folder (game data).
-
-Forward **UDP 31510–31512** on your router for public play. Servers register with `master.kingpin.info`.
-
-## Docker (Linux VPS)
-
-For a real Linux host / VPS:
+## Local / VPS CLI
 
 ```bash
-cd ~/kingpin-servers   # copy this project over
 docker compose up -d --build
 ```
 
-Optional host networking:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.linux.yml up -d --build
-```
-
-Edit `game/*/server.cfg`, then `docker compose up -d --build` (configs are baked into the image).
+Configs: `configs/mmod_dm/`, `configs/mmod_bm/`, `configs/ctf/`.
