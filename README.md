@@ -54,7 +54,7 @@ Set these on each Coolify app (or in compose). Unset = keep baked-in `server_*.c
 | `KP_PORT` | all | `31510` |
 | `KP_MAXCLIENTS` / `KP_MAX_PLAYERS` | all | `16` |
 | `KP_PUBLIC` | all | `1` |
-| `KP_MASTER` | all | `master.kingpin.info` |
+| `KP_MASTER` | all | `master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info` |
 | `KP_MAP` | all | `kpdm5` / `team_pv` / `ctf_terminal` |
 | `KP_FRAGLIMIT` | all | `30` |
 | `KP_TIMELIMIT` | all | `20` |
