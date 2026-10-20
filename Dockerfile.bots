@@ -1,0 +1,66 @@
+# Hypov8 Botmatch (Windows gamex86.dll) via Wine — for DM and Bagman only.
+FROM i386/debian:bookworm-slim
+
+RUN dpkg --add-architecture i386 \
+	&& apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		ca-certificates curl unzip findutils \
+		wine wine32 xvfb \
+	&& rm -rf /var/lib/apt/lists/*
+
+WORKDIR /kingpin
+
+ARG KP_BASE=https://www.kingpin.info/download/kingpin
+ARG KP_DL=https://www.kingpin.info/download/index.php
+
+# Windows KPDED2 + Botmatch AceBots+MM2.0 v037
+RUN set -eux; \
+	mkdir -p /tmp/dl /kingpin/main/maps /kingpin/mmod_dm /kingpin/mmod_bm; \
+	curl -fsSL "$KP_BASE/server/unofficial/kpded2/windows/kpded2-win32.zip" -o /tmp/dl/kpded2.zip; \
+	unzip -qo /tmp/dl/kpded2.zip -d /tmp/dl/kpded2; \
+	cp /tmp/dl/kpded2/kpded2.exe /kingpin/kpded2.exe; \
+	cp /tmp/dl/kpded2/GeoIP.dat /kingpin/GeoIP.dat 2>/dev/null || true; \
+	cp /tmp/dl/kpded2/GeoIP.dll /kingpin/GeoIP.dll 2>/dev/null || true; \
+	curl -fsSL "${KP_DL}?dir=kingpin/server/mods/botmatch_mm/server_files/&file=gamex86_hypo_comp%2Bbots-v037.zip" -o /tmp/dl/bots.zip; \
+	if head -c 15 /tmp/dl/bots.zip | grep -qi '<!DOCTYPE\|<html'; then \
+		echo "ERROR: Botmatch download returned HTML" >&2; exit 1; \
+	fi; \
+	unzip -qo /tmp/dl/bots.zip -d /tmp/dl/bots; \
+	if [ -d /tmp/dl/bots/compbots ]; then \
+		cp -a /tmp/dl/bots/compbots /kingpin/compbots; \
+	elif [ -f /tmp/dl/bots/gamex86.dll ]; then \
+		mkdir -p /kingpin/compbots; \
+		cp -a /tmp/dl/bots/. /kingpin/compbots/; \
+	else \
+		echo "ERROR: unexpected Botmatch zip layout" >&2; find /tmp/dl/bots -maxdepth 2; exit 1; \
+	fi; \
+	test -f /kingpin/compbots/gamex86.dll; \
+	rm -rf /tmp/dl
+
+# Same community map packs as the Linux image
+COPY scripts/download-maps.sh /tmp/download-maps.sh
+RUN chmod +x /tmp/download-maps.sh \
+	&& /tmp/download-maps.sh /kingpin /tmp/mapdl \
+	&& cp -f /kingpin/mmod_dm/maps.txt /kingpin/compbots/maps.txt \
+	&& cp -f /kingpin/mmod_bm/maps_bm.txt /kingpin/compbots/maps_bm.txt \
+	&& rm -rf /kingpin/mmod_dm /kingpin/mmod_bm \
+	&& rm -f /tmp/download-maps.sh
+
+COPY configs/compbots/server_dm.cfg configs/compbots/server_bm.cfg \
+	configs/compbots/comp_dm.ini configs/compbots/comp_bm.ini \
+	/kingpin/compbots/
+COPY scripts/entrypoint-bots.sh /kingpin/entrypoint-bots.sh
+RUN chmod +x /kingpin/entrypoint-bots.sh \
+	&& export WINEPREFIX=/kingpin/.wine WINEARCH=win32 \
+	&& xvfb-run -a wineboot --init \
+	&& wineserver -w \
+	&& chmod -R a+rwX /kingpin
+
+ENV KP_MODE=dm \
+	KP_PORT=31510 \
+	WINEPREFIX=/kingpin/.wine \
+	WINEARCH=win32 \
+	WINEDEBUG=-all
+
+EXPOSE 31510/udp 31512/udp
+ENTRYPOINT ["/kingpin/entrypoint-bots.sh"]

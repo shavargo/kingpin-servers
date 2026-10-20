@@ -1,26 +1,16 @@
-# Coolify app: kingpin-dm — UDP 31510
+# Coolify app: kingpin-dm — UDP 31510 (Botmatch via Wine)
 services:
   dm:
-    build: .
-    image: kingpin-servers:dm
+    build:
+      context: .
+      dockerfile: Dockerfile.bots
+    image: kingpin-servers:dm-bots
     container_name: kingpin-dm
     restart: unless-stopped
     tty: true
     stdin_open: true
+    environment:
+      KP_MODE: dm
+      KP_PORT: "31510"
     ports:
       - "31510:31510/udp"
-    command:
-      [
-        "./kpded2",
-        "+set",
-        "dedicated",
-        "1",
-        "+set",
-        "game",
-        "mmod_dm",
-        "+set",
-        "port",
-        "31510",
-        "+exec",
-        "server.cfg",
-      ]

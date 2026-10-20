@@ -1,26 +1,16 @@
-# Coolify app: kingpin-bagman — UDP 31512
+# Coolify app: kingpin-bagman — UDP 31512 (Botmatch via Wine)
 services:
   bagman:
-    build: .
-    image: kingpin-servers:bagman
+    build:
+      context: .
+      dockerfile: Dockerfile.bots
+    image: kingpin-servers:bagman-bots
     container_name: kingpin-bagman
     restart: unless-stopped
     tty: true
     stdin_open: true
+    environment:
+      KP_MODE: bm
+      KP_PORT: "31512"
     ports:
       - "31512:31512/udp"
-    command:
-      [
-        "./kpded2",
-        "+set",
-        "dedicated",
-        "1",
-        "+set",
-        "game",
-        "mmod_bm",
-        "+set",
-        "port",
-        "31512",
-        "+exec",
-        "server.cfg",
-      ]
