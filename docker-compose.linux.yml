@@ -1,0 +1,13 @@
+# Host networking on a real Linux VPS (best for Quake2/Kingpin UDP + master).
+#   docker compose -f docker-compose.yml -f docker-compose.linux.yml up -d --build
+
+services:
+  dm:
+    network_mode: host
+    ports: !reset []
+  ctf:
+    network_mode: host
+    ports: !reset []
+  bagman:
+    network_mode: host
+    ports: !reset []

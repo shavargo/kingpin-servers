@@ -1,0 +1,76 @@
+# Coolify / Linux: builds image from this repo and publishes UDP game ports.
+services:
+  dm:
+    build: .
+    image: kingpin-servers:latest
+    container_name: kingpin-dm
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "31510:31510/udp"
+    command:
+      [
+        "./kpded2",
+        "+set",
+        "dedicated",
+        "1",
+        "+set",
+        "game",
+        "mmod_dm",
+        "+set",
+        "port",
+        "31510",
+        "+exec",
+        "server.cfg",
+      ]
+
+  ctf:
+    build: .
+    image: kingpin-servers:latest
+    container_name: kingpin-ctf
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "31511:31511/udp"
+    command:
+      [
+        "./kpded2",
+        "+set",
+        "dedicated",
+        "1",
+        "+set",
+        "game",
+        "ctf",
+        "+set",
+        "port",
+        "31511",
+        "+exec",
+        "server.cfg",
+      ]
+
+  bagman:
+    build: .
+    image: kingpin-servers:latest
+    container_name: kingpin-bagman
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "31512:31512/udp"
+    command:
+      [
+        "./kpded2",
+        "+set",
+        "dedicated",
+        "1",
+        "+set",
+        "game",
+        "mmod_bm",
+        "+set",
+        "port",
+        "31512",
+        "+exec",
+        "server.cfg",
+      ]
