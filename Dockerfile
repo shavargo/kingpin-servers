@@ -40,13 +40,17 @@ RUN chmod +x /tmp/download-maps.sh \
 COPY configs/mmod_dm/server.cfg configs/mmod_dm/comp.ini /kingpin/mmod_dm/
 COPY configs/mmod_bm/server.cfg configs/mmod_bm/comp.ini /kingpin/mmod_bm/
 COPY configs/ctf/server.cfg configs/ctf/comp.ini /kingpin/ctf/
+COPY configs/ctf/server.cfg /kingpin/ctf/server.cfg.template
+COPY scripts/apply-server-env.sh scripts/entrypoint-ctf.sh /kingpin/
 
 # Keep generated map rotation files if present; fall back to config copies
 COPY configs/mmod_bm/maps_bm.txt /kingpin/mmod_bm/maps_bm.txt.bak
 RUN if [ ! -s /kingpin/mmod_bm/maps_bm.txt ]; then cp /kingpin/mmod_bm/maps_bm.txt.bak /kingpin/mmod_bm/maps_bm.txt; fi \
 	&& cp -f /kingpin/mmod_bm/maps_bm.txt /kingpin/mmod_bm/maps.txt \
 	&& rm -f /kingpin/mmod_bm/maps_bm.txt.bak \
+	&& chmod +x /kingpin/entrypoint-ctf.sh /kingpin/apply-server-env.sh \
 	&& chown -R nobody:nogroup /kingpin
 
 USER nobody
-CMD ["./kpded2", "+set", "dedicated", "1", "+set", "game", "mmod_dm", "+set", "port", "31510", "+exec", "server.cfg"]
+ENV KP_PORT=31511
+ENTRYPOINT ["/kingpin/entrypoint-ctf.sh"]

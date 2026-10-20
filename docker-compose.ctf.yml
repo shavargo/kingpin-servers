@@ -5,22 +5,14 @@ services:
     image: kingpin-servers:ctf
     container_name: kingpin-ctf
     restart: unless-stopped
-    tty: true
-    stdin_open: true
+    environment:
+      KP_PORT: "31511"
+      KP_HOSTNAME: "Shavargo's Kingpin CTF"
+      KP_MAXCLIENTS: "16"
+      KP_PUBLIC: "1"
+      KP_FRAGLIMIT: "0"
+      KP_TIMELIMIT: "10"
+      KP_CAPTURELIMIT: "0"
+      KP_MAP: ctf_terminal
     ports:
       - "31511:31511/udp"
-    command:
-      [
-        "./kpded2",
-        "+set",
-        "dedicated",
-        "1",
-        "+set",
-        "game",
-        "ctf",
-        "+set",
-        "port",
-        "31511",
-        "+exec",
-        "server.cfg",
-      ]

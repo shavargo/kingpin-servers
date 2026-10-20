@@ -19,6 +19,7 @@ esac
 
 cp -f "/kingpin/compbots/comp_${MODE}.ini" /kingpin/compbots/comp.ini
 cp -f "/kingpin/compbots/server_${MODE}.cfg" /kingpin/compbots/server.cfg
+/kingpin/apply-server-env.sh /kingpin/compbots/server.cfg
 
 # xvfb-run + wine double-fork leaves a dead server; start Xvfb ourselves.
 rm -f /tmp/.X99-lock /tmp/.X11-unix/X99 2>/dev/null || true
@@ -35,7 +36,6 @@ done
 sleep 0.5
 
 cd /kingpin
-# Keep wine in the foreground so the container stays up with the server.
 exec wine kpded2.exe \
 	+set basedir 'Z:\kingpin' \
 	+set dedicated 1 \

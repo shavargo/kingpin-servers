@@ -10,5 +10,15 @@ services:
     environment:
       KP_MODE: bm
       KP_PORT: "31512"
+      KP_HOSTNAME: "Shavargo's Kingpin Bagman"
+      KP_MAXCLIENTS: "16"
+      KP_PUBLIC: "1"
+      KP_FRAGLIMIT: "0"
+      KP_TIMELIMIT: "30"
+      KP_CASHLIMIT: "3000"
+      KP_MAP: team_pv
+      KP_BOTSKILL: "2"
+      KP_BOT_MAX: "8"
+      KP_BOT_MAX_PLAYERS: "12"
     ports:
       - "31512:31512/udp"

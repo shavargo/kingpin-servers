@@ -43,3 +43,29 @@ docker compose -f docker-compose.ctf.yml up -d --build
 ```
 
 Configs: `configs/compbots/` (DM/Bagman bots), `configs/ctf/`, legacy `configs/mmod_*` (Linux Monkey Mod).
+
+## Environment variables (Coolify)
+
+Set these on each Coolify app (or in compose). Unset = keep baked-in `server_*.cfg` defaults. Restart/redeploy after changes.
+
+| Variable | Applies to | Example |
+|----------|------------|---------|
+| `KP_HOSTNAME` | all | `Shavargo's Kingpin DM` |
+| `KP_PORT` | all | `31510` |
+| `KP_MAXCLIENTS` / `KP_MAX_PLAYERS` | all | `16` |
+| `KP_PUBLIC` | all | `1` |
+| `KP_MASTER` | all | `master.kingpin.info` |
+| `KP_MAP` | all | `kpdm5` / `team_pv` / `ctf_terminal` |
+| `KP_FRAGLIMIT` | all | `30` |
+| `KP_TIMELIMIT` | all | `20` |
+| `KP_DMFLAGS` | all | `788` |
+| `KP_PROPS` | all | `1` |
+| `KP_IDLE_CLIENT` | all | `120` |
+| `KP_BOTSKILL` | DM / Bagman | `2` (0–4) |
+| `KP_BOT_MAX` | DM / Bagman | `8` |
+| `KP_BOT_MAX_PLAYERS` | DM / Bagman | `12` |
+| `KP_CASHLIMIT` | Bagman | `3000` |
+| `KP_CAPTURELIMIT` | CTF | `0` |
+| `KP_MODE` | bots image | `dm` or `bm` |
+
+See `.env.example`.

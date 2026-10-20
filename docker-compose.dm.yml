@@ -10,5 +10,14 @@ services:
     environment:
       KP_MODE: dm
       KP_PORT: "31510"
+      KP_HOSTNAME: "Shavargo's Kingpin DM"
+      KP_MAXCLIENTS: "16"
+      KP_PUBLIC: "1"
+      KP_FRAGLIMIT: "30"
+      KP_TIMELIMIT: "20"
+      KP_MAP: kpdm5
+      KP_BOTSKILL: "2"
+      KP_BOT_MAX: "8"
+      KP_BOT_MAX_PLAYERS: "12"
     ports:
       - "31510:31510/udp"
