@@ -8,7 +8,7 @@ Docker images build from [kingpin.info](https://www.kingpin.info/download/) — 
 | kingpin-ctf | `docker-compose.ctf.yml` | Shavargo's Kingpin CTF | 31511 | Native Linux KPDED2 |
 | kingpin-bagman | `docker-compose.bagman.yml` | Shavargo's Kingpin Bagman | 31512 | Wine + Hypov8 Botmatch v37 |
 
-Repo: https://github.com/shavargo/kingpin-servers (private)
+Repo: https://github.com/shavargo/kingpin-servers
 
 **Bots (DM / Bagman):** AceBots only ship as a Windows `gamex86.dll`, so those two apps use `Dockerfile.bots` (Wine + Xvfb). Bots spawn after the first human joins. CTF stays on the Linux Monkey/CTF image (`Dockerfile`).
 
@@ -23,7 +23,7 @@ Repo: https://github.com/shavargo/kingpin-servers (private)
 ## Coolify (one application per mode)
 
 1. Project **Kingpin** → **+ Add Resource** (repeat three times)
-2. **Private Repository (with Deploy Key)** → `git@github.com:shavargo/kingpin-servers.git`
+2. **Public Repository** → `https://github.com/shavargo/kingpin-servers.git` (no deploy key)
 3. Build pack: **Docker Compose**
 4. Compose file: `/docker-compose.dm.yml` (then `.ctf.yml`, then `.bagman.yml`)
 5. Name each app `kingpin-dm` / `kingpin-ctf` / `kingpin-bagman`
