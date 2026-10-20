@@ -33,7 +33,7 @@ RUN set -eux; \
 # Community map packs (same yo-ass + bagman set as kingpin-launcher)
 COPY scripts/download-maps.sh /tmp/download-maps.sh
 RUN chmod +x /tmp/download-maps.sh \
-	&& KP_BASE=https://www.kingpin.info/download/kingpin /tmp/download-maps.sh /kingpin/main/maps /tmp/mapdl \
+	&& /tmp/download-maps.sh /kingpin /tmp/mapdl \
 	&& rm -f /tmp/download-maps.sh
 
 # Server configs (hostnames, limits, admin)

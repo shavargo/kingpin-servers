@@ -1,5 +1,4 @@
 downloads
-configs
 *.md
 .git
 docker-compose*.yml
