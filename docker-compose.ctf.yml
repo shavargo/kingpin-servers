@@ -1,4 +1,5 @@
 # Coolify app: kingpin-ctf — UDP 31511
+# Override any KP_* via Coolify → Environment Variables (values below are defaults).
 services:
   ctf:
     build: .
@@ -6,15 +7,15 @@ services:
     container_name: kingpin-ctf
     restart: unless-stopped
     environment:
-      KP_PORT: "31511"
-      KP_HOSTNAME: "Shavargo's Kingpin CTF"
-      KP_MAXCLIENTS: "16"
-      KP_PUBLIC: "1"
-      KP_MASTER: "master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info"
-      KP_FRAGLIMIT: "0"
-      KP_TIMELIMIT: "10"
-      KP_CAPTURELIMIT: "0"
-      KP_MAP: ctf_terminal
+      KP_PORT: "${KP_PORT:-31511}"
+      KP_HOSTNAME: "${KP_HOSTNAME:-Shavargo's Kingpin CTF}"
+      KP_MAXCLIENTS: "${KP_MAXCLIENTS:-16}"
+      KP_PUBLIC: "${KP_PUBLIC:-1}"
+      KP_MASTER: "${KP_MASTER:-master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info master.shavargo.com}"
+      KP_FRAGLIMIT: "${KP_FRAGLIMIT:-0}"
+      KP_TIMELIMIT: "${KP_TIMELIMIT:-10}"
+      KP_CAPTURELIMIT: "${KP_CAPTURELIMIT:-0}"
+      KP_MAP: "${KP_MAP:-ctf_terminal}"
     ports:
       # Game port + Gamespy query port (gameport-10). Master validates via 31501.
       - "31511:31511/udp"

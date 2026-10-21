@@ -1,4 +1,5 @@
 # Coolify app: kingpin-dm — UDP 31510 (Botmatch via Wine)
+# Override any KP_* via Coolify → Environment Variables (values below are defaults).
 services:
   dm:
     build:
@@ -8,18 +9,23 @@ services:
     container_name: kingpin-dm
     restart: unless-stopped
     environment:
-      KP_MODE: dm
-      KP_PORT: "31510"
-      KP_HOSTNAME: "Shavargo's Kingpin DM"
-      KP_MAXCLIENTS: "16"
-      KP_PUBLIC: "1"
-      KP_MASTER: "master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info"
-      KP_FRAGLIMIT: "30"
-      KP_TIMELIMIT: "20"
-      KP_MAP: kpdm5
-      KP_BOTSKILL: "2"
-      KP_BOT_MAX: "8"
-      KP_BOT_MAX_PLAYERS: "12"
+      KP_MODE: "${KP_MODE:-dm}"
+      KP_PORT: "${KP_PORT:-31510}"
+      KP_HOSTNAME: "${KP_HOSTNAME:-Shavargo's Kingpin DM}"
+      KP_MAXCLIENTS: "${KP_MAXCLIENTS:-16}"
+      KP_PUBLIC: "${KP_PUBLIC:-1}"
+      KP_MASTER: "${KP_MASTER:-master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info master.shavargo.com}"
+      KP_FRAGLIMIT: "${KP_FRAGLIMIT:-30}"
+      KP_TIMELIMIT: "${KP_TIMELIMIT:-20}"
+      KP_MAP: "${KP_MAP:-kpdm5}"
+      KP_BOTSKILL: "${KP_BOTSKILL:-2}"
+      KP_BOT_MAX: "${KP_BOT_MAX:-8}"
+      KP_BOT_MAX_PLAYERS: "${KP_BOT_MAX_PLAYERS:-12}"
+    volumes:
+      # Private binaries/configs on host only — not in git.
+      - /data/kingpin-private/kpded2.exe:/kingpin/kpded2.exe:ro
+      - /data/kingpin-private/botmatch-v039.5/gamex86.dll:/kingpin/compbots/gamex86.dll:ro
+      - /data/kingpin-private/botmatch-v039.5/server_dm.cfg:/kingpin/compbots/server_dm.cfg:ro
     ports:
       # Game port + Gamespy query port (gameport-10). Master validates via 31500.
       - "31510:31510/udp"
