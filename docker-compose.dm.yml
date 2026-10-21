@@ -13,6 +13,7 @@ services:
       KP_HOSTNAME: "Shavargo's Kingpin DM"
       KP_MAXCLIENTS: "16"
       KP_PUBLIC: "1"
+      KP_MASTER: "master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info"
       KP_FRAGLIMIT: "30"
       KP_TIMELIMIT: "20"
       KP_MAP: kpdm5
@@ -20,4 +21,6 @@ services:
       KP_BOT_MAX: "8"
       KP_BOT_MAX_PLAYERS: "12"
     ports:
+      # Game port + Gamespy query port (gameport-10). Master validates via 31500.
       - "31510:31510/udp"
+      - "31500:31500/udp"

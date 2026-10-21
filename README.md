@@ -28,7 +28,7 @@ Repo: https://github.com/shavargo/kingpin-servers
 4. Compose file: `/docker-compose.dm.yml` (then `.ctf.yml`, then `.bagman.yml`)
 5. Name each app `kingpin-dm` / `kingpin-ctf` / `kingpin-bagman`
 6. Deploy each (first build downloads map packs — slow; later builds use cache)
-7. Open host firewall **UDP 31510–31512**
+7. Open host firewall **UDP 31500–31512** (game ports 31510–12 plus Gamespy query ports 31500–02 — masters validate via gameport−10)
 
 ## Local / VPS CLI
 

@@ -13,6 +13,7 @@ services:
       KP_HOSTNAME: "Shavargo's Kingpin Bagman"
       KP_MAXCLIENTS: "16"
       KP_PUBLIC: "1"
+      KP_MASTER: "master0.kingpin.info master1.kingpin.info master2.kingpin.info master3.kingpin.info"
       KP_FRAGLIMIT: "0"
       KP_TIMELIMIT: "30"
       KP_CASHLIMIT: "3000"
@@ -21,4 +22,6 @@ services:
       KP_BOT_MAX: "8"
       KP_BOT_MAX_PLAYERS: "12"
     ports:
+      # Game port + Gamespy query port (gameport-10). Master validates via 31502.
       - "31512:31512/udp"
+      - "31502:31502/udp"

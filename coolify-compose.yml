@@ -2,7 +2,7 @@
 # Requires image `kingpin-servers:latest` available on the host
 # (load via: docker load < kingpin-servers.tar  OR pull from your registry)
 #
-# After deploy, open host firewall UDP 31510-31512.
+# After deploy, open host firewall UDP 31500-31512 (game + Gamespy query ports).
 
 services:
   dm:
@@ -13,6 +13,7 @@ services:
     stdin_open: true
     ports:
       - "31510:31510/udp"
+      - "31500:31500/udp"
     command:
       [
         "./kpded2",
@@ -37,6 +38,7 @@ services:
     stdin_open: true
     ports:
       - "31511:31511/udp"
+      - "31501:31501/udp"
     command:
       [
         "./kpded2",
@@ -61,6 +63,7 @@ services:
     stdin_open: true
     ports:
       - "31512:31512/udp"
+      - "31502:31502/udp"
     command:
       [
         "./kpded2",
