@@ -1,16 +1,16 @@
 # Kingpin servers (DM / CTF / Bagman)
 
-Docker images build from [kingpin.info](https://www.kingpin.info/download/) — KPDED2, Monkey Mod / Botmatch, Colors CTF, and the same community map packs as **kingpin-launcher**.
+Docker images build from [kingpin.info](https://www.kingpin.info/download/) — KPDED2, Hypov8 Botmatch MM2.0 (Linux native port), Colors CTF, and the same community map packs as **kingpin-launcher**. All servers run on native Linux 32-bit `kpded2` without Wine.
 
 | Coolify app | Compose file | Hostname | UDP | Runtime |
 |-------------|--------------|----------|-----|---------|
-| kingpin-dm | `docker-compose.dm.yml` | Shavargo's Kingpin DM | 31510 | Wine + Hypov8 Botmatch v37 |
-| kingpin-ctf | `docker-compose.ctf.yml` | Shavargo's Kingpin CTF | 31511 | Native Linux KPDED2 |
-| kingpin-bagman | `docker-compose.bagman.yml` | Shavargo's Kingpin Bagman | 31512 | Wine + Hypov8 Botmatch v37 |
+| kingpin-dm | `docker-compose.dm.yml` | Shavargo's Kingpin DM | 31510 | Native Linux KPDED2 + Botmatch MM2.0 |
+| kingpin-ctf | `docker-compose.ctf.yml` | Shavargo's Kingpin CTF | 31511 | Native Linux KPDED2 + Colors CTF v1.6 |
+| kingpin-bagman | `docker-compose.bagman.yml` | Shavargo's Kingpin Bagman | 31512 | Native Linux KPDED2 + Botmatch MM2.0 |
 
 Repo: https://github.com/shavargo/kingpin-servers
 
-**Bots (DM / Bagman):** AceBots only ship as a Windows `gamex86.dll`, so those two apps use `Dockerfile.bots` (Wine + Xvfb). Bots spawn after the first human joins. CTF stays on the Linux Monkey/CTF image (`Dockerfile`).
+**Bots (DM / Bagman):** Powered by the native Linux port of Hypov8 Botmatch MM2.0 (`gamei386.so`) with dynamic mobster name selection from `botnames.txt` prefixed with `[BOT]`. Bots spawn after the first human joins or via server config.
 
 ## Map packs (downloaded at image build)
 

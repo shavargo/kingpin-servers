@@ -1,4 +1,4 @@
-# Coolify app: kingpin-bagman — UDP 31512 (Botmatch via Wine)
+# Coolify app: kingpin-bagman — UDP 31512 (Native Linux Hypov8 Botmatch)
 # Override any KP_* via Coolify → Environment Variables (values below are defaults).
 services:
   bagman:
@@ -22,11 +22,6 @@ services:
       KP_BOTSKILL: "${KP_BOTSKILL:-2}"
       KP_BOT_MAX: "${KP_BOT_MAX:-8}"
       KP_BOT_MAX_PLAYERS: "${KP_BOT_MAX_PLAYERS:-12}"
-    volumes:
-      # Private binaries/configs on host only — not in git.
-      - /data/kingpin-private/kpded2.exe:/kingpin/kpded2.exe:ro
-      - /data/kingpin-private/botmatch-v039.5/gamex86.dll:/kingpin/compbots/gamex86.dll:ro
-      - /data/kingpin-private/botmatch-v039.5/server_bm.cfg:/kingpin/compbots/server_bm.cfg:ro
     ports:
       # Game port + Gamespy query port (gameport-10). Master validates via 31502.
       - "31512:31512/udp"
