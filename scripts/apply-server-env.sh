@@ -44,6 +44,7 @@ set_cvar sv_bot_max "${KP_BOT_MAX:-}"
 set_cvar sv_bot_max_players "${KP_BOT_MAX_PLAYERS:-}"
 set_cvar idle_client "${KP_IDLE_CLIENT:-}"
 set_cvar props "${KP_PROPS:-}"
+set_cvar rcon_password "${KP_RCON_PASSWORD:-}"
 
 if [ -n "${KP_MASTER:-}" ]; then
 	grep -v '^setmaster ' "$tmp" >"${tmp}.2" || true

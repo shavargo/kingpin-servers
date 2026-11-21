@@ -17,9 +17,15 @@ cp -f "/kingpin/compbots/comp_${MODE}.ini" /kingpin/compbots/comp.ini
 cp -f "/kingpin/compbots/server_${MODE}.cfg" /kingpin/compbots/server.cfg
 /kingpin/apply-server-env.sh /kingpin/compbots/server.cfg
 
+RCON_ARG=""
+if [ -n "${KP_RCON_PASSWORD:-}" ]; then
+	RCON_ARG="+set rcon_password $KP_RCON_PASSWORD"
+fi
+
 cd /kingpin
 exec stdbuf -oL -eL ./kpded2 \
 	+set dedicated 1 \
 	+set game compbots \
 	+set port "$PORT" \
+	$RCON_ARG \
 	+exec server.cfg
